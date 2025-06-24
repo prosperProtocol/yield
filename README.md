@@ -1,12 +1,26 @@
-# Soroban Project
+# YieldDistributor - Soroban Smart Contract
 
-## Project Structure
+Este repositorio contiene un contrato inteligente llamado **YieldDistributor** desarrollado en Rust para la red Soroban de Stellar. El contrato está diseñado para distribuir rendimientos (yield) a los usuarios de manera eficiente y transparente.
 
-This repository uses the recommended structure for a Soroban project:
+## Características principales
+
+- **Lenguaje:** Rust
+- **Plataforma:** Soroban (Stellar Smart Contracts)
+- **Contrato:** YieldDistributor
+
+## Funcionalidad del contrato
+
+El contrato **YieldDistributor** implementa las siguientes funciones principales:
+
+- `accrue`: Calcula y distribuye el rendimiento acumulado a los usuarios según sus saldos y la estrategia configurada.
+- `update_strategy`: Permite actualizar la estrategia de cálculo de rendimiento (por ejemplo, cambiar el APR, modificar parámetros de distribución, etc).
+
+## Estructura del proyecto
+
 ```text
 .
 ├── contracts
-│   └── hello_world
+│   └── yield_distributor
 │       ├── src
 │       │   ├── lib.rs
 │       │   └── test.rs
@@ -15,7 +29,63 @@ This repository uses the recommended structure for a Soroban project:
 └── README.md
 ```
 
-- New Soroban contracts can be put in `contracts`, each in their own directory. There is already a `hello_world` contract in there to get you started.
-- If you initialized this project with any other example contracts via `--with-example`, those contracts will be in the `contracts` directory as well.
-- Contracts should have their own `Cargo.toml` files that rely on the top-level `Cargo.toml` workspace for their dependencies.
-- Frontend libraries can be added to the top-level directory as well. If you initialized this project with a frontend template via `--frontend-template` you will have those files already included.
+- Los contratos Soroban se ubican en la carpeta `contracts`, cada uno en su propio directorio.
+- El contrato principal de este repositorio es `yield_distributor`.
+
+## Requisitos
+
+- [Rust](https://www.rust-lang.org/tools/install)
+- [soroban-cli](https://github.com/stellar/soroban-tools)
+- [cargo-make](https://sagiegurari.github.io/cargo-make/) (opcional para automatizar tareas)
+
+## Instalación y uso
+
+1. **Clona el repositorio:**
+   ```sh
+   git clone https://github.com/tu-usuario/yield-distributor.git
+   cd yield-distributor
+   ```
+
+2. **Instala las dependencias:**
+   ```sh
+   rustup target add wasm32-unknown-unknown
+   cargo install --locked soroban-cli
+   ```
+
+3. **Compila el contrato:**
+   ```sh
+   cd contracts/yield_distributor
+   cargo build --target wasm32-unknown-unknown --release
+   ```
+
+4. **Despliega el contrato en Soroban:**
+   Consulta la [documentación oficial de Soroban](https://soroban.stellar.org/docs) para desplegar el contrato usando `soroban-cli`.
+
+## Ejemplo de uso
+
+```rust
+// Llama a accrue para distribuir el rendimiento
+yield_distributor.accrue(env);
+
+// Actualiza la estrategia de rendimiento
+yield_distributor.update_strategy(env, nueva_estrategia);
+```
+
+## Pruebas
+
+Para ejecutar las pruebas unitarias:
+```sh
+cargo test
+```
+
+## Contribución
+
+¡Las contribuciones son bienvenidas! Por favor abre un issue o pull request para sugerencias y mejoras.
+
+## Licencia
+
+Este proyecto está bajo la licencia MIT.
+
+---
+
+Desarrollado con ❤️ usando Rust
