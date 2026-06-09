@@ -1,11 +1,10 @@
 #![no_std]
 use soroban_sdk::{contract, contractimpl, contracttype, contracterror, panic_with_error};
-use soroban_sdk::{Env, Address, Vec};
+use soroban_sdk::{Env, Address, Vec, Symbol};
 use soroban_sdk::{IntoVal, symbol_short};
 
 const ADMIN_KEY: &str = "ADMIN";
 const INDEX_PCT: &str = "PCT";
-const INDEX_TOKEN: &str = "TOKEN";
 
 #[contracttype]
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -120,16 +119,17 @@ impl YieldDistributor {
 
     pub fn set_token(
         env: &Env,
+        token_id: Symbol,
         token: Address,
     ) {
         let admin = Self::get_admin(&env);
         admin.require_auth();
 
-        env.storage().instance().set(&INDEX_TOKEN, &token);
+        env.storage().instance().set(&token_id, &token);
     }
 
-    fn get_token(env: &Env) -> Address {
-        env.storage().instance().get(&INDEX_TOKEN)
+    fn get_token(env: &Env, token_id: Symbol) -> Address {
+        env.storage().instance().get(&token_id)
             .unwrap_or_else(|| panic_with_error!(env, YieldError::NotInitialized))
     }
 
@@ -138,12 +138,13 @@ impl YieldDistributor {
         env: Env,
         user: Address,
         memo: u64,
-        amount: i128
+        amount: i128,
+        token_id: Symbol
     ) {
         let admin = Self::get_admin(&env);
         admin.require_auth();
         let pct = Self::get_pct(&env);
-        let token = Self::get_token(&env);
+        let token = Self::get_token(&env, token_id);
         let created_at: u64 = env.ledger().timestamp();
         let expires_at: u64 = created_at + 2592000;
 
@@ -201,11 +202,6 @@ impl YieldDistributor {
         if strategy.status != StrategyStatus::Active {
             panic_with_error!(&env, YieldError::InvalidStatus);
         }
-        let pct = strategy.pct / 12;
-        let balance = strategy.amount;
-        let yield_amount = balance * pct;
-        let token_client: CustomTokenClient<'_> = CustomTokenClient::new(&env, &strategy.token);
-        token_client.mint(&user, &yield_amount, &admin);
         strategy.status = StrategyStatus::Expired;
         Self::update_strat(&env, user.clone(), strategy);
     }
